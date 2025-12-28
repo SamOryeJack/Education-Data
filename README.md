@@ -135,8 +135,8 @@ erDiagram
 
 ![Analytics Dashboard](images/Analytics_dashboard.png)
 
-**Top Row:** Year-over-year accountability metrics (Average Grade, Pass Rate, Attendance)  
-**Bottom Row:** Population demographics (Countries, Program Types, Course Rigor)
+**Top Row:** Population demographics (Countries, Program Types, Course Rigor)
+**Bottom Row:** Year-over-year accountability metrics (Average Grade, Pass Rate, Attendance)  
 
 ---
 
