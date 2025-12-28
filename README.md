@@ -216,7 +216,7 @@ Reach ───────────┘
 
 ## Additional Queries
 
-See [`queries/sample_queries.sql`](queries/sample_queries.sql) for additional SQL examples including:
+See [`queries/sample_queries.sql`](queries/Queries.sql) for additional SQL examples including:
 - At-risk student identification
 - Course performance analysis
 - Boarding vs. day student comparisons
