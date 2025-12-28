@@ -133,7 +133,7 @@ erDiagram
 
 ## Analytics Dashboard
 
-![Analytics Dashboard](images/portfolio_final_6_charts.png)
+![Analytics Dashboard](images/Analytics_dashboard.png)
 
 **Top Row:** Year-over-year accountability metrics (Average Grade, Pass Rate, Attendance)  
 **Bottom Row:** Population demographics (Countries, Program Types, Course Rigor)
@@ -144,7 +144,7 @@ erDiagram
 
 ### 1. Enrollment and Performance Trends
 
-![Enrollment Trends](images/query3_yoy_trend.png)
+![Enrollment Trends](images/enrollment_trends.png)
 
 Dual-axis visualization showing enrollment growth alongside academic performance over 4 years.
 ```sql
@@ -166,7 +166,7 @@ ORDER BY t.school_year;
 
 ### 2. Retention Risk Analysis
 
-![Retention Analysis](images/query_missing_hw_retention.png)
+![Retention Analysis](images/retention_analysis_HW.png)
 
 **Finding:** Students who stay longer miss less homework — 3x difference between short-term (1.8%) and long-term (0.6%) students. This pattern suggests missing homework rate could serve as an early warning indicator for retention risk.
 ```sql
