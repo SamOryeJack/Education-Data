@@ -1,7 +1,6 @@
 # Education Data Warehouse
 
-K-12 student data warehouse tracking 636 students across 4 school years.
-
+High School data warehouse tracking 636 students across 4 school years. Star schema design with 312K+ records integrating data from 3 source systems (SIS, CRM, boarding). Built for accountability analytics and at-risk identification.
 ## Database Schema
 ```mermaid
 erDiagram
