@@ -1,0 +1,7 @@
+stride_accountability:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: '../school_analytics.duckdb'
+      threads: 4
