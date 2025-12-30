@@ -1,8 +1,14 @@
-# Education Data Warehouse
+# 🎓 Education Data Warehouse
 
-School data warehouse tracking 636 Foreign Exchange students across 4 school years. Star schema design with 312K+ records integrating data from 3 source systems (SIS, CRM, boarding). Built for accountability analytics and at-risk identification.
+Student data warehouse tracking **636 international students** across 4 school years. Star schema design with **312K+ records** integrating data from 3 source systems. Built to demonstrate K-12 accountability analytics and at-risk identification using the **ABC Early Warning Framework**.
 
-## Key Metrics
+## 🚀 Live Dashboard
+
+**[View Interactive Dashboard](https://samoryejack-education-data.streamlit.app)** *(Streamlit Cloud)*
+
+---
+
+## 📊 Key Metrics
 
 | Metric | Value |
 |--------|-------|
@@ -13,140 +19,198 @@ School data warehouse tracking 636 Foreign Exchange students across 4 school yea
 | Countries Represented | 23 |
 | Average Pass Rate | 94.0% |
 
-## Database Schema
-```mermaid
-erDiagram
-	dim_students {
-		int student_key PK
-		text school_id UK
-		text sf_id
-		text amerigo_id
-		text reach_id
-		text first_name
-		text last_name
-		text program_type
-		text status
-	}
-	dim_terms {
-		int term_key PK
-		text term_name
-		text school_year
-		int term_order
-	}
-	dim_courses {
-		int course_key PK
-		text course_code UK
-		text course_name
-		text department
-		text course_rigor
-	}
-	fct_grades {
-		int grade_key PK
-		int student_key FK
-		int course_key FK
-		int term_key FK
-		real q1_score
-		real q2_score
-		real final_score
-	}
-	fct_assignments {
-		int assignment_key PK
-		int student_key FK
-		int course_key FK
-		int term_key FK
-		text quarter
-		real points_earned
-		real points_possible
-		int is_missing
-	}
-	fct_attendance_quarter {
-		int att_quarter_key PK
-		int student_key FK
-		int term_key FK
-		text quarter
-		int total_absent
-		int total_tardy
-	}
-	fct_attendance_course {
-		int att_course_key PK
-		int student_key FK
-		int course_key FK
-		int term_key FK
-		int absent
-		int tardy
-	}
-	fct_attendance_daily {
-		int att_daily_key PK
-		int student_key FK
-		int term_key FK
-		text date
-		text homeroom
-	}
-	fct_student_term_enrollment {
-		int enrollment_key PK
-		int student_key FK
-		int term_key FK
-		int is_boarding
-		text housing_type
-	}
-	ref_attendance_codes {
-		text code PK
-		text description
-		text category
-	}
-	dim_students||--o{fct_grades:"student_key"
-	dim_courses||--o{fct_grades:"course_key"
-	dim_terms||--o{fct_grades:"term_key"
-	dim_students||--o{fct_assignments:"student_key"
-	dim_courses||--o{fct_assignments:"course_key"
-	dim_terms||--o{fct_assignments:"term_key"
-	dim_students||--o{fct_attendance_quarter:"student_key"
-	dim_terms||--o{fct_attendance_quarter:"term_key"
-	dim_students||--o{fct_attendance_course:"student_key"
-	dim_courses||--o{fct_attendance_course:"course_key"
-	dim_terms||--o{fct_attendance_course:"term_key"
-	dim_students||--o{fct_attendance_daily:"student_key"
-	dim_terms||--o{fct_attendance_daily:"term_key"
-	dim_students||--o{fct_student_term_enrollment:"student_key"
-	dim_terms||--o{fct_student_term_enrollment:"term_key"
-```
+---
 
-*Star schema design: 3 dimension tables, 6 fact tables, 1 reference table.*
+## 🛠️ Tech Stack
 
-## Database Tables
-
-| Table | Rows | Description |
-|-------|------|-------------|
-| dim_students | 636 | Student dimension with demographics |
-| dim_terms | 8 | Academic terms (Fall/Spring × 4 years) |
-| dim_courses | 1,058 | Course catalog with rigor levels |
-| fct_grades | 8,623 | Quarterly grades by student/course |
-| fct_assignments | 265,571 | Individual assignment scores |
-| fct_attendance_quarter | 3,884 | Quarter-level attendance summary |
-| fct_attendance_course | 7,792 | Course-level attendance |
-| fct_attendance_daily | 22,884 | Daily attendance by period |
-| fct_student_term_enrollment | 1,942 | Term enrollment with boarding status |
-| ref_attendance_codes | 41 | Attendance code definitions |
-| **Total** | **312,439** | |
+| Layer | Technology | Purpose |
+|-------|------------|---------|
+| Database | **DuckDB** | Analytical database (columnar, fast) |
+| Transformation | **dbt-core** | SQL modeling with tests & docs |
+| Dashboard | **Streamlit** | Interactive web application |
+| Visualization | **Plotly** | Charts and graphs |
+| Cloud | **Streamlit Cloud** | Free hosting |
 
 ---
 
-## Analytics Dashboard
+## 📁 Project Structure
+
+```
+Education-Data/
+├── README.md
+├── requirements.txt
+├── .gitignore
+│
+├── data/
+│   └── school_analytics.duckdb      # DuckDB database (5.3 MB)
+│
+├── dbt_project/                      # dbt transformation layer
+│   ├── dbt_project.yml
+│   ├── profiles.yml
+│   └── models/
+│       ├── staging/                  # 5 staging models
+│       ├── intermediate/             # 4 intermediate models
+│       └── marts/                    # 2 mart models
+│
+├── streamlit_app/                    # Interactive dashboard
+│   ├── app.py
+│   └── pages/
+│       ├── 1_📊_Overview.py
+│       ├── 2_👤_Student_Detail.py
+│       └── 3_📈_Subgroup_Analysis.py
+│
+├── images/                           # Visualization assets
+│   ├── Analytics_dashboard.png
+│   ├── enrollment_trends.png
+│   └── retention_analysis_HW.png
+│
+├── queries/                          # Sample SQL queries
+│   └── Queries.sql
+│
+└── docs/                             # Documentation
+    ├── CURRENT_STATE.md
+    ├── TARGET_STATE.md
+    └── MIGRATION_PLAN.md
+```
+
+---
+
+## 🎯 ABC Early Warning Framework
+
+Students are identified as **at-risk** using three indicators aligned with ESSA accountability requirements:
+
+| Factor | Metric | Threshold | Column |
+|--------|--------|-----------|--------|
+| **A**ttendance | Chronic Absence | ≥10% days missed | `is_chronically_absent` |
+| **B**ehavior | Discipline | ISS≥1, OSS≥1, Cuts≥2, or Truancy≥1 | `is_behavior_risk` |
+| **C**ourse | Failing Grades | Any final grade <75 | `is_failing_any` |
+
+**At-Risk Definition**: Students with **2+ risk factors** (abc_risk_score ≥ 2)
+
+### Results by Year
+
+| Year | Students | Chronic Absent | Behavior Risk | Failing Any | At-Risk |
+|------|----------|----------------|---------------|-------------|---------|
+| 2022-23 | 230 | 33.5% | 20.0% | 27.0% | 22.2% |
+| 2023-24 | 260 | 46.9% | 8.8% | 30.8% | 23.5% |
+| 2024-25 | 253 | 12.3% | 6.3% | 24.1% | 8.3% |
+| 2025-26 | 228 | 1.3% | 3.1% | 25.0% | 3.1% |
+
+*Note: 2025-26 is partial year (Fall semester only)*
+
+---
+
+## 📐 Database Schema
+
+```mermaid
+erDiagram
+    dim_students {
+        int student_key PK
+        text school_id UK
+        text first_name
+        text last_name
+        text program_type
+        text status
+    }
+    dim_terms {
+        int term_key PK
+        text term_name
+        text school_year
+        int term_order
+    }
+    dim_courses {
+        int course_key PK
+        text course_code UK
+        text course_name
+        text department
+        text course_rigor
+    }
+    fct_grades {
+        int grade_key PK
+        int student_key FK
+        int course_key FK
+        int term_key FK
+        real q1_score
+        real q2_score
+        real final_score
+    }
+    fct_assignments {
+        int assignment_key PK
+        int student_key FK
+        int course_key FK
+        int term_key FK
+        text quarter
+        real points_earned
+        real points_possible
+        int is_missing
+    }
+    fct_attendance_quarter {
+        int att_quarter_key PK
+        int student_key FK
+        int term_key FK
+        text quarter
+        int total_absent
+        int total_tardy
+    }
+    mart_student_accountability {
+        int student_key PK
+        text school_year
+        real absence_rate
+        int is_chronically_absent
+        int is_behavior_risk
+        int is_failing_any
+        int abc_risk_score
+        int is_at_risk
+    }
+    dim_students ||--o{ fct_grades : "student_key"
+    dim_courses ||--o{ fct_grades : "course_key"
+    dim_terms ||--o{ fct_grades : "term_key"
+    dim_students ||--o{ fct_assignments : "student_key"
+    dim_students ||--o{ fct_attendance_quarter : "student_key"
+    dim_students ||--o{ mart_student_accountability : "student_key"
+```
+
+*Star schema: 3 dimensions, 6 facts, 2 marts, 1 reference table*
+
+---
+
+## 📊 Database Tables
+
+| Table | Rows | Layer | Description |
+|-------|------|-------|-------------|
+| dim_students | 636 | Core | Student dimension (anonymized) |
+| dim_terms | 8 | Core | Academic terms |
+| dim_courses | 1,058 | Core | Course catalog |
+| fct_grades | 8,623 | Core | Quarterly grades |
+| fct_assignments | 265,571 | Core | Assignment scores |
+| fct_attendance_quarter | 3,884 | Core | Quarter attendance |
+| fct_attendance_course | 7,792 | Core | Course attendance |
+| fct_attendance_daily | 22,884 | Core | Daily attendance |
+| fct_student_term_enrollment | 1,942 | Core | Enrollment by term |
+| ref_attendance_codes | 42 | Reference | Code definitions |
+| **mart_student_accountability** | **971** | **Mart** | **ABC risk profiles** |
+| mart_school_year_summary | 32 | Mart | Aggregated metrics |
+| **Total** | **~314K** | | |
+
+---
+
+## 📈 Analytics Dashboard
 
 ![Analytics Dashboard](images/Analytics_dashboard.png)
 
-**Top Row:** Population demographics (Countries, Program Types, Course Rigor)
-**Bottom Row:** Year-over-year accountability metrics (Average Grade, Pass Rate, Attendance)  
+**Top Row:** Population demographics (Countries, Program Types, Course Rigor)  
+**Bottom Row:** Year-over-year accountability metrics (Average Grade, Pass Rate, Attendance)
 
 ---
 
-## Sample Analysis
+## 🔍 Sample Analysis
 
 ### 1. Enrollment and Performance Trends
 
 ![Enrollment Trends](images/enrollment_trends.png)
 
 Dual-axis visualization showing enrollment growth alongside academic performance over 4 years.
+
 ```sql
 SELECT 
     t.school_year,
@@ -169,6 +233,7 @@ ORDER BY t.school_year;
 ![Retention Analysis](images/retention_analysis_HW.png)
 
 **Finding:** Students who stay longer miss less homework — 3x difference between short-term (1.8%) and long-term (0.6%) students. This pattern suggests missing homework rate could serve as an early warning indicator for retention risk.
+
 ```sql
 SELECT 
     terms_enrolled,
@@ -193,41 +258,111 @@ ORDER BY terms_enrolled;
 
 ---
 
-## Technical Details
+## 🚀 Quick Start
 
-| Component | Technology |
-|-----------|------------|
-| Database | SQLite |
-| Schema Design | Star schema (Kimball methodology) |
-| Data Sources | Infinite Campus (SIS), Salesforce (CRM), Reach (Boarding) |
-| Visualization | Python (matplotlib, pandas) |
-| Identity Resolution | Cross-platform ID matching across 3 systems |
+### Prerequisites
+- Python 3.9+
+- pip
 
-### Data Pipeline
-```
-Infinite Campus ─┐
-                 │
-Salesforce ──────┼──► Identity Resolution ──► Star Schema ──► Analytics
-                 │
-Reach ───────────┘
+### Installation
+
+```bash
+# Clone repository
+git clone https://github.com/SamOryeJack/Education-Data.git
+cd Education-Data
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run dbt models (optional - already materialized)
+cd dbt_project
+dbt run --profiles-dir .
+dbt test --profiles-dir .
+
+# Launch dashboard locally
+cd ../streamlit_app
+streamlit run app.py
 ```
 
 ---
 
-## Additional Queries
+## 🔧 dbt Models
 
-See [`queries/Queries.sql`](queries/Queries.sql) for additional SQL examples including:
-- At-risk student identification
-- Course performance analysis
-- Boarding vs. day student comparisons
-- Attendance pattern analysis
+### Model Lineage
+
+```
+Source Tables (10)
+    │
+    ▼
+Staging Layer (5 views)
+    ├── stg_students
+    ├── stg_grades
+    ├── stg_attendance_quarter
+    ├── stg_attendance_daily
+    └── stg_assignments
+    │
+    ▼
+Intermediate Layer (4 tables)
+    ├── int_student_attendance      → is_chronically_absent
+    ├── int_student_behavior        → is_behavior_risk
+    ├── int_student_course_performance → is_failing_any
+    └── int_student_assignments     → is_high_missing
+    │
+    ▼
+Marts Layer (2 tables)
+    ├── mart_student_accountability → Complete ABC profile
+    └── mart_school_year_summary    → Aggregated metrics
+```
+
+### Running dbt
+
+```bash
+cd dbt_project
+dbt debug --profiles-dir .   # Verify connection
+dbt run --profiles-dir .     # Build all models
+dbt test --profiles-dir .    # Run 23 tests
+dbt docs generate            # Generate documentation
+```
 
 ---
 
-## Skills Demonstrated
+## 🔒 Data Privacy
 
-- **Data Modeling:** Star schema design with proper dimension/fact separation
-- **SQL:** Complex joins, window functions, aggregations, subqueries
-- **Data Integration:** Identity resolution across 3 disparate systems
-- **Analytics:** Year-over-year trending, cohort analysis, at-risk identification
-- **Visualization:** Multi-chart dashboards, dual-axis charts, waffle charts
+All student data has been **anonymized**:
+- Student names → Marvel character names (636 characters)
+- Teacher names → Fictional TV/movie teachers (178 teachers)
+- All real identifiers removed
+
+Mapping files available in `data/` for reference.
+
+---
+
+## 📚 Additional Resources
+
+- [`queries/Queries.sql`](queries/Queries.sql) - Additional SQL examples
+- [`docs/CURRENT_STATE.md`](docs/CURRENT_STATE.md) - Current project state
+- [`docs/data_dictionary.md`](docs/data_dictionary.md) - Column definitions
+
+---
+
+## 💼 Skills Demonstrated
+
+| Category | Skills |
+|----------|--------|
+| **Data Modeling** | Star schema, Kimball methodology, fact/dimension design |
+| **SQL** | CTEs, window functions, aggregations, complex joins |
+| **dbt** | Models, tests, documentation, staging/marts pattern |
+| **Python** | Streamlit, Plotly, pandas, data pipelines |
+| **Analytics** | ESSA accountability, ABC framework, cohort analysis |
+| **Data Integration** | Identity resolution across 3 source systems |
+
+---
+
+## 👤 Author
+
+**Sam Oryejack**  
+Campus Coordinator | Data Analytics  
+[LinkedIn][(https://linkedin.com/in/yourprofile) ](https://www.linkedin.com/in/paul-desmond-155495219/)
+---
+
+*Built as a portfolio project demonstrating K-12 accountability analytics skills for Research and Accountability Data Analyst roles.*
