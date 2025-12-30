@@ -4,7 +4,7 @@ Student data warehouse tracking **636 international students** across 4 school y
 
 ## 🚀 Live Dashboard
 
-**[View Interactive Dashboard](https://samoryejack-education-data.streamlit.app)** *(Streamlit Cloud)*
+**[View Interactive Dashboard](https://education-data-bvqfw2xtdke5dfugzzh3x3.streamlit.app/)** *(Streamlit Cloud)*
 
 ---
 
