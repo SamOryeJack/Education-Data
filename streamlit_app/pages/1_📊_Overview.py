@@ -3,20 +3,12 @@ import duckdb
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import os
 
 st.set_page_config(page_title="Overview", page_icon="📊", layout="wide")
 
 @st.cache_resource
 def get_connection():
-    paths = [
-        "data/school_analytics.duckdb",
-        "../data/school_analytics.duckdb",
-    ]
-    for path in paths:
-        if os.path.exists(path):
-            return duckdb.connect(path, read_only=True)
-    return duckdb.connect("data/school_analytics.duckdb", read_only=True)
+    return duckdb.connect("data/school_analytics_v3.duckdb", read_only=True)
 
 conn = get_connection()
 

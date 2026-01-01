@@ -1,9 +1,9 @@
 version: 2
-
 sources:
   - name: main
     schema: main
     tables:
+      # Original tables
       - name: dim_students
         description: Student dimension with Marvel character names
       - name: dim_terms
@@ -24,3 +24,17 @@ sources:
         description: Student enrollment by term
       - name: ref_attendance_codes
         description: Attendance code definitions
+      
+      # V3 tables (ESSA alignment)
+      - name: fct_graduation_outcomes
+        description: "V3: Student graduation cohort tracking and final status for ACGR"
+      - name: fct_esl_progression
+        description: "V3: ESL level progression by student-year (ESSA Indicator 4)"
+      - name: fct_course_credits
+        description: "V3: Credits attempted and earned per course"
+      - name: fct_standardized_tests
+        description: "V3: Synthetic PSAT/SAT scores for juniors"
+      - name: fct_ap_exam_scores
+        description: "V3: AP exam scores derived from course grades"
+      - name: fct_interventions
+        description: "V3: Intervention records for at-risk students"

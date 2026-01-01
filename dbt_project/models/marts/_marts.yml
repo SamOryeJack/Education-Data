@@ -26,3 +26,39 @@ models:
         tests:
           - accepted_values:
               values: ['Overall', 'Gender', 'Program', 'Boarding']
+
+  - name: mart_acgr
+    description: "V3: Adjusted Cohort Graduation Rate by subgroup with N-size suppression"
+    columns:
+      - name: cohort_year
+        tests:
+          - not_null
+      - name: subgroup_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Overall', 'Gender', 'Country', 'ESL Level']
+      - name: acgr
+        description: "Graduation rate (graduates / adjusted_cohort * 100)"
+      - name: is_suppressed
+        description: "1 if N < 10 (FERPA compliance)"
+        tests:
+          - accepted_values:
+              values: [0, 1]
+
+  - name: mart_essa_accountability
+    description: "V3: All 5 ESSA indicators by subgroup with N-size suppression"
+    columns:
+      - name: school_year
+        tests:
+          - not_null
+      - name: subgroup_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Overall', 'Gender', 'ESL Level']
+      - name: is_suppressed
+        description: "1 if N < 10 (FERPA compliance)"
+        tests:
+          - accepted_values:
+              values: [0, 1]
