@@ -2,20 +2,12 @@ import streamlit as st
 import duckdb
 import pandas as pd
 import plotly.express as px
-import os
 
 st.set_page_config(page_title="Subgroup Analysis", page_icon="📈", layout="wide")
 
 @st.cache_resource
 def get_connection():
-    paths = [
-        "data/school_analytics.duckdb",
-        "../data/school_analytics.duckdb",
-    ]
-    for path in paths:
-        if os.path.exists(path):
-            return duckdb.connect(path, read_only=True)
-    return duckdb.connect("data/school_analytics.duckdb", read_only=True)
+    return duckdb.connect("data/school_analytics_v3.duckdb", read_only=True)
 
 conn = get_connection()
 
@@ -33,13 +25,10 @@ with col2:
 # Build query based on subgroup
 if subgroup_type == "Gender":
     group_col = "gender"
-    filter_col = "gender"
 elif subgroup_type == "Program":
     group_col = "program_type"
-    filter_col = "program_type"
 else:
     group_col = "CASE WHEN is_boarding = 1 THEN 'Boarding' ELSE 'Non-Boarding' END"
-    filter_col = "is_boarding"
 
 # Get comparison data
 comparison = conn.execute(f"""
@@ -54,7 +43,7 @@ comparison = conn.execute(f"""
         ROUND(AVG(avg_final_score), 1) as avg_gpa
     FROM mart_student_accountability
     WHERE school_year = '{selected_year}'
-      AND {filter_col} IS NOT NULL
+      AND {group_col.split(' as ')[0] if ' as ' not in group_col else group_col.replace("CASE WHEN is_boarding = 1 THEN 'Boarding' ELSE 'Non-Boarding' END", "is_boarding")} IS NOT NULL
     GROUP BY {group_col}
     ORDER BY subgroup
 """).fetchdf()
@@ -65,13 +54,12 @@ st.dataframe(comparison, use_container_width=True, hide_index=True)
 
 # Visualization
 st.subheader("At-Risk Rate by Subgroup")
-if len(comparison) > 0:
-    fig = px.bar(comparison, x='subgroup', y='at_risk_pct',
-                 color='at_risk_pct',
-                 color_continuous_scale=['green', 'yellow', 'red'],
-                 labels={'subgroup': subgroup_type, 'at_risk_pct': 'At-Risk %'})
-    fig.update_layout(height=400, showlegend=False)
-    st.plotly_chart(fig, use_container_width=True)
+fig = px.bar(comparison, x='subgroup', y='at_risk_pct',
+             color='at_risk_pct',
+             color_continuous_scale=['green', 'yellow', 'red'],
+             labels={'subgroup': subgroup_type, 'at_risk_pct': 'At-Risk %'})
+fig.update_layout(height=400, showlegend=False)
+st.plotly_chart(fig, use_container_width=True)
 
 # Gap Analysis
 st.subheader("Gap Analysis")

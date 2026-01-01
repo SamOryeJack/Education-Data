@@ -3,5 +3,5 @@ stride_accountability:
   outputs:
     dev:
       type: duckdb
-      path: '../school_analytics.duckdb'
+      path: '../school_analytics_v3.duckdb'
       threads: 4

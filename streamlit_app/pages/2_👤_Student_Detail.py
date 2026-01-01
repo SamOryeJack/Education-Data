@@ -1,20 +1,12 @@
 import streamlit as st
 import duckdb
 import pandas as pd
-import os
 
 st.set_page_config(page_title="Student Detail", page_icon="👤", layout="wide")
 
 @st.cache_resource
 def get_connection():
-    paths = [
-        "data/school_analytics.duckdb",
-        "../data/school_analytics.duckdb",
-    ]
-    for path in paths:
-        if os.path.exists(path):
-            return duckdb.connect(path, read_only=True)
-    return duckdb.connect("data/school_analytics.duckdb", read_only=True)
+    return duckdb.connect("data/school_analytics_v3.duckdb", read_only=True)
 
 conn = get_connection()
 
@@ -60,8 +52,7 @@ st.divider()
 st.subheader("📊 ABC Risk Profile by Year")
 
 for _, row in student_data.iterrows():
-    risk_emoji = "🔴" if row['is_at_risk'] else "🟢"
-    with st.expander(f"**{row['school_year']}** - Risk Score: {int(row['abc_risk_score'])}/3 {risk_emoji}"):
+    with st.expander(f"**{row['school_year']}** - Risk Score: {int(row['abc_risk_score'])}/3 {'🔴' if row['is_at_risk'] else '🟢'}"):
         col1, col2, col3 = st.columns(3)
         
         with col1:
@@ -69,10 +60,8 @@ for _, row in student_data.iterrows():
             chronic = "🔴 Yes" if row['is_chronically_absent'] else "🟢 No"
             st.write(f"Chronic Absent: {chronic}")
             st.write(f"Absence Rate: {row['absence_rate']:.1f}%")
-            absent_days = row['total_absent_days'] if row['total_absent_days'] else 0
-            st.write(f"Days Absent: {absent_days:.1f}")
-            tardies = int(row['total_tardies']) if row['total_tardies'] else 0
-            st.write(f"Tardies: {tardies}")
+            st.write(f"Days Absent: {row['total_absent_days']:.1f}")
+            st.write(f"Tardies: {int(row['total_tardies'] or 0)}")
         
         with col2:
             st.markdown("**Behavior**")
@@ -88,8 +77,7 @@ for _, row in student_data.iterrows():
             st.write(f"Failing Any: {failing}")
             st.write(f"Courses: {int(row['courses_taken'] or 0)}")
             st.write(f"Passed: {int(row['courses_passed'] or 0)}")
-            avg = row['avg_final_score']
-            st.write(f"Avg Grade: {avg:.1f}" if avg else "N/A")
+            st.write(f"Avg Grade: {row['avg_final_score']:.1f}" if row['avg_final_score'] else "N/A")
 
 # Course grades for latest year
 st.divider()
