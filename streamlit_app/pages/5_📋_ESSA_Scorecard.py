@@ -54,7 +54,7 @@ with col3:
     acgr = conn.execute("""
         SELECT acgr FROM mart_acgr 
         WHERE subgroup_type = 'Overall' 
-        ORDER BY cohort_year DESC LIMIT 1
+        ORDER BY graduation_year DESC LIMIT 1
     """).fetchdf()
     acgr_val = acgr['acgr'].iloc[0] if len(acgr) > 0 else 'N/A'
     st.metric("ACGR", f"{acgr_val:.1f}%" if acgr_val != 'N/A' else acgr_val)
