@@ -291,7 +291,7 @@ ORDER BY graduation_year, subgroup_value;
 
 ### 2. ESSA Indicator Trends
 ### ESSA Scorecard
-![ESSA Scorecard](images/ESSA_Scorecard.png)
+![ESSA Scorecard](images/ESSA.png)
 
 ```sql
 SELECT 
@@ -312,7 +312,7 @@ ORDER BY school_year;
 ---
 
 ### ACGR Tracker
-![ACGR Tracker](images/ACGR_Tracker.png)
+![ACGR Tracker](images/ACGR.png)
 ## Quick Start
 
 ### Prerequisites
