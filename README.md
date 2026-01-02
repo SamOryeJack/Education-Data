@@ -271,16 +271,9 @@ erDiagram
 ### Overview
 ![Overview Dashboard](images/Overview.png)
 
-### ACGR Tracker
-![ACGR Tracker](images/ACGR_Tracker.png)
-
-### ESSA Scorecard
-![ESSA Scorecard](images/ESSA_Scorecard.png)
-
 ---
 
 ## 🔍 Sample Analysis
-
 ### 1. Graduates by Subgroup
 
 ```sql
@@ -297,6 +290,8 @@ ORDER BY graduation_year, subgroup_value;
 ```
 
 ### 2. ESSA Indicator Trends
+### ESSA Scorecard
+![ESSA Scorecard](images/ESSA_Scorecard.png)
 
 ```sql
 SELECT 
@@ -311,13 +306,13 @@ ORDER BY school_year;
 ```
 
 ### 3. Retention Risk Analysis
-
 ![Retention Analysis](images/retention_analysis_HW.png)
-
 **Finding:** Students who stay longer miss less homework — 3x difference between short-term (1.8%) and long-term (0.6%) students.
 
 ---
 
+### ACGR Tracker
+![ACGR Tracker](images/ACGR_Tracker.png)
 ## Quick Start
 
 ### Prerequisites
