@@ -1,6 +1,6 @@
 # Education Data Warehouse
 
-Student data warehouse tracking **636 international SUPERHERO students** across 4 school years. Star schema design with **329K+ records** integrating data from 3 source systems. Built to demonstrate K-12 accountability analytics using the **ABC Early Warning Framework** and **ESSA Accountability Indicators**.
+Student data warehouse tracking **636 international Marvel students** across 4 school years. Star schema design with **329K+ records** integrating data from 3 source systems. Built to demonstrate K-12 accountability analytics using the **ABC Early Warning Framework** and **ESSA Accountability Indicators**.
 
 ## Live Dashboard
 
