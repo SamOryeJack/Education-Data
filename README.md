@@ -1,14 +1,14 @@
-# 🎓 Education Data Warehouse
+# Education Data Warehouse
 
 Student data warehouse tracking **636 international SUPERHERO students** across 4 school years. Star schema design with **329K+ records** integrating data from 3 source systems. Built to demonstrate K-12 accountability analytics using the **ABC Early Warning Framework** and **ESSA Accountability Indicators**.
 
-## 🚀 Live Dashboard
+## Live Dashboard
 
 **[View Interactive Dashboard](https://education-data-bvqfw2xtdke5dfugzzh3x3.streamlit.app/)** *(Streamlit Cloud)*
 
 ---
 
-## 📊 Key Metrics
+## Key Metrics
 
 | Metric | Value |
 |--------|-------|
@@ -17,13 +17,13 @@ Student data warehouse tracking **636 international SUPERHERO students** across 
 | School Years | 4 (2022-2026) |
 | Source Systems | 3 (Infinite Campus, Salesforce, Reach) |
 | Countries Represented | 23 |
-| Graduation Cohorts | 6 (2016-2021) |
+| Graduation Years | 4 (2022-2026) |
 | ESSA Indicators | 5 |
 | Average Pass Rate | 94.0% |
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology | Purpose |
 |-------|------------|---------|
@@ -35,7 +35,7 @@ Student data warehouse tracking **636 international SUPERHERO students** across 
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Education-Data/
@@ -82,7 +82,7 @@ Education-Data/
 
 ---
 
-## 🎯 ABC Early Warning Framework
+## ABC Early Warning Framework
 
 Students are identified as **at-risk** using three indicators aligned with ESSA accountability requirements:
 
@@ -107,45 +107,39 @@ Students are identified as **at-risk** using three indicators aligned with ESSA 
 
 ---
 
-## 📋 ESSA Accountability Framework (V3)
+## ESSA Accountability Framework (V3)
 
 The V3 release adds comprehensive ESSA (Every Student Succeeds Act) alignment with all 5 federal accountability indicators:
 
-### ESSA Scorecard (2024-25)
+### ESSA Scorecard (2025-26)
 
 | Indicator | Metric | Value | Target |
 |-----------|--------|-------|--------|
-| 1. Academic Achievement | GPA / Pass Rate | 90.7 / 94.5% | Higher is better |
+| 1. Academic Achievement | GPA / Pass Rate | 91.7 / 93.1% | Higher is better |
 | 2. Academic Growth | % Improved YoY | 54.3% | Higher is better |
-| 3. Graduation Rate | ACGR | 86.5%* | ≥90% |
-| 4. EL Proficiency | % Progressed | 58.9% | Higher is better |
-| 5. School Quality | Chronic Absent | 12.3% | Lower is better |
+| 3. Graduation Rate | ACGR | 100.0% | ≥90% |
+| 4. EL Proficiency | % Progressed | 56.8% | Higher is better |
+| 5. School Quality | Chronic Absent | 1.3% | Lower is better |
 
-*Most recent completed cohort (2019)
+### Graduates by Year
 
-### Adjusted Cohort Graduation Rate (ACGR)
+| Graduation Year | Graduates | ACGR |
+|-----------------|-----------|------|
+| 2022-23 | 87 | 100% |
+| 2023-24 | 58 | 100% |
+| 2024-25 | 65 | 100% |
+| 2025-26 | 33 | 100% |
 
-| Cohort | Expected Grad | Students | Graduates | ACGR |
-|--------|---------------|----------|-----------|------|
-| 2016 | 2020 | 22 | 22 | 100.0% |
-| 2017 | 2021 | 26 | 26 | 100.0% |
-| 2018 | 2022 | 37 | 37 | 100.0% |
-| 2019 | 2023 | 89 | 77 | 86.5% |
-| 2020 | 2024 | 58 | 40 | 69.0% |
-| 2021 | 2025 | 75 | 18 | 26.9%** |
-
-**Cohort 2021 has many students still active
+**Total: 243 graduates** - All diploma-seeking seniors who completed Q4 grades graduated
 
 ### FERPA Compliance
 
 All subgroup reporting includes **N-size suppression** (N<10) to protect student privacy:
-- 82% of Country subgroups suppressed
-- 57% of ACGR subgroups suppressed
 - Suppressed values shown as "--" in dashboard
 
 ---
 
-## 📐 Database Schema
+## Database Schema
 
 ```mermaid
 erDiagram
@@ -182,7 +176,7 @@ erDiagram
     fct_graduation_outcomes {
         int outcome_key PK
         int student_key FK
-        int cohort_year
+        text graduation_year
         text final_status
         int in_graduation_cohort
     }
@@ -197,9 +191,8 @@ erDiagram
         int is_at_risk
     }
     mart_acgr {
-        int cohort_year
+        text graduation_year
         text subgroup_type
-        int cohort_count
         int graduates
         real acgr
         int is_suppressed
@@ -215,12 +208,12 @@ erDiagram
     dim_students ||--o{ fct_grades : "student_key"
     dim_students ||--o{ fct_graduation_outcomes : "student_key"
     dim_students ||--o{ mart_student_accountability : "student_key"
-    fct_graduation_outcomes ||--o{ mart_acgr : "cohort_year"
+    fct_graduation_outcomes ||--o{ mart_acgr : "graduation_year"
 ```
 
 ---
 
-## 📊 Database Tables
+## Database Tables
 
 ### Core Tables (Original)
 
@@ -241,13 +234,13 @@ erDiagram
 
 | Table | Rows | Type | Purpose |
 |-------|------|------|---------|
-| fct_graduation_outcomes | 629 | Derived | Cohort tracking, final status |
+| fct_graduation_outcomes | 627 | Derived | Graduation tracking, final status |
 | fct_esl_progression | 971 | Derived | EL proficiency tracking |
 | fct_course_credits | 8,623 | Derived | Credits attempted/earned |
 | fct_standardized_tests | 332 | Synthetic | PSAT/SAT scores |
 | fct_ap_exam_scores | 976 | Derived | AP exam results |
 | fct_interventions | 502 | Fabricated | Intervention records |
-| **mart_acgr** | **90** | **Aggregated** | **Graduation rates by subgroup** |
+| **mart_acgr** | **69** | **Aggregated** | **Graduation rates by subgroup** |
 | **mart_essa_accountability** | **132** | **Aggregated** | **5 ESSA indicators** |
 
 ### Marts Summary
@@ -256,7 +249,7 @@ erDiagram
 |-------|------|-------------|
 | mart_student_accountability | 971 | ABC risk profiles |
 | mart_school_year_summary | 32 | Aggregated metrics |
-| mart_acgr | 90 | ACGR by subgroup |
+| mart_acgr | 69 | Graduation rates by subgroup |
 | mart_essa_accountability | 132 | ESSA indicators |
 | **Total** | **~329K** | |
 
@@ -272,29 +265,35 @@ erDiagram
 | 📊 Overview | KPIs, trend charts, risk distribution |
 | 👤 Student Detail | Individual student profiles |
 | 📈 Subgroup Analysis | Compare by gender/program/boarding |
-| 🎓 ACGR Tracker | **V3:** Graduation rates by cohort |
+| 🎓 ACGR Tracker | **V3:** Graduation rates by year |
 | 📋 ESSA Scorecard | **V3:** 5 ESSA indicators dashboard |
 
-![Analytics Dashboard](images/Analytics_dashboard.png)
+### Overview
+![Overview Dashboard](images/Overview.png)
+
+### ACGR Tracker
+![ACGR Tracker](images/ACGR_Tracker.png)
+
+### ESSA Scorecard
+![ESSA Scorecard](images/ESSA_Scorecard.png)
 
 ---
 
 ## 🔍 Sample Analysis
 
-### 1. ACGR by Subgroup
+### 1. Graduates by Subgroup
 
 ```sql
 SELECT 
-    cohort_year,
+    graduation_year,
     subgroup_type,
     subgroup_value,
-    cohort_count as n,
-    graduates,
+    graduates as n,
     acgr,
     CASE WHEN is_suppressed = 1 THEN 'Suppressed' ELSE 'Reported' END as status
 FROM mart_acgr
 WHERE subgroup_type = 'Gender'
-ORDER BY cohort_year, subgroup_value;
+ORDER BY graduation_year, subgroup_value;
 ```
 
 ### 2. ESSA Indicator Trends
@@ -319,7 +318,7 @@ ORDER BY school_year;
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Python 3.9+
@@ -331,9 +330,6 @@ ORDER BY school_year;
 # Clone repository
 git clone https://github.com/SamOryeJack/Education-Data.git
 cd Education-Data
-
-# Checkout V3 branch
-git checkout v3
 
 # Install dependencies
 pip install -r requirements.txt
@@ -350,7 +346,7 @@ streamlit run app.py
 
 ---
 
-## 🔧 dbt Models
+## dbt Models
 
 ### Model Lineage
 
@@ -392,7 +388,7 @@ dbt docs generate            # Generate documentation
 
 ---
 
-## 🔒 Data Privacy
+## Data Privacy
 
 All student data has been **anonymized**:
 - Student names → Marvel character names (636 characters)
@@ -402,7 +398,7 @@ All student data has been **anonymized**:
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 | Document | Description |
 |----------|-------------|
@@ -413,7 +409,7 @@ All student data has been **anonymized**:
 
 ---
 
-## 💼 Skills Demonstrated
+## Skills Demonstrated
 
 | Category | Skills |
 |----------|--------|
@@ -427,7 +423,7 @@ All student data has been **anonymized**:
 
 ---
 
-## 👤 Author
+## Author
 
 **Sam Oryejack**  
 Campus Coordinator | Data Analytics  
@@ -435,7 +431,7 @@ Campus Coordinator | Data Analytics
 
 ---
 
-## 📝 Version History
+## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
