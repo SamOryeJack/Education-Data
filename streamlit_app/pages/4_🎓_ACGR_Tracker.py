@@ -7,7 +7,7 @@ st.set_page_config(page_title="ACGR Tracker", page_icon="🎓", layout="wide")
 
 @st.cache_resource
 def get_connection():
-    return duckdb.connect("data/school_analytics_v3.duckdb", read_only=True)
+    return duckdb.connect("data/school_analytics.duckdb", read_only=True)
 
 conn = get_connection()
 
