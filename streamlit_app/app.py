@@ -10,7 +10,7 @@ st.set_page_config(
 
 @st.cache_resource
 def get_connection():
-    return duckdb.connect("data/school_analytics_v3.duckdb", read_only=True)
+    return duckdb.connect("data/school_analytics.duckdb", read_only=True)
 
 st.title("🎓 Student Accountability Dashboard")
 st.markdown("### ABC Early Warning Framework + ESSA Alignment")
