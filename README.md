@@ -1,6 +1,6 @@
 # Education Data Analytics Portfolio
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)]([https://samoryejack-education-data.streamlit.app](https://education-data-bvqfw2xtdke5dfugzzh3x3.streamlit.app/))
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://education-data-bvqfw2xtdke5dfugzzh3x3.streamlit.app/)
 
 ## Overview
 
