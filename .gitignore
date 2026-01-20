@@ -2,20 +2,16 @@
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
 .Python
-.venv/
+*.so
+.eggs/
+*.egg-info/
+*.egg
+
+# Virtual environments
 venv/
 ENV/
-
-# dbt
-target/
-dbt_packages/
-logs/
-.user.yml
-
-# Streamlit
-.streamlit/secrets.toml
+.venv/
 
 # IDE
 .idea/
@@ -27,9 +23,13 @@ logs/
 .DS_Store
 Thumbs.db
 
-# Temp files
-*.tmp
-*.bak
+# Jupyter
+.ipynb_checkpoints/
 
-# Keep the database (it's only 5.3MB)
-!data/*.duckdb
+# Sensitive files - DO NOT COMMIT
+*_mapping.csv
+*_REAL.csv
+*.duckdb.wal
+
+# Streamlit
+.streamlit/secrets.toml
