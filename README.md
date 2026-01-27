@@ -5,7 +5,7 @@
 ## Overview
 
 Education data warehouse for 636 students across 4 years, demonstrating:
-- ESSA 5-indicator accountability framework
+- ESSA 5-indicator accountability framework (including EL Progress tracking)
 - FERPA-compliant subgroup reporting (N<10 suppression)
 - ABC Early Warning System (Attendance, Behavior, Course performance)
 - Cohort-based graduation tracking
@@ -18,10 +18,22 @@ Education data warehouse for 636 students across 4 years, demonstrating:
 
 | Component | Technology |
 |-----------|------------|
-| Database | DuckDB |
+| Database | DuckDB (V2.5) |
 | Dashboard | Streamlit + Plotly |
 | Data Model | Star schema (dimensions + facts + marts) |
 | Languages | Python, SQL |
+
+---
+
+## ESSA Indicators
+
+| # | Indicator | Implementation |
+|---|-----------|----------------|
+| 1 | Academic Achievement | Course pass rate (≥75), Avg GPA |
+| 2 | Academic Progress | Year-over-year GPA change |
+| 3 | Graduation Rate | Cohort tracking (ACGR-style) |
+| 4 | EL Progress | ESL level progression (intake → current) |
+| 5 | School Quality | Chronic absenteeism rate (≥10%) |
 
 ---
 
@@ -37,6 +49,7 @@ erDiagram
         varchar country FK
         varchar program_type
         varchar esl_level
+        varchar last_esl_level
         bigint is_active
         bigint ever_boarding
     }
@@ -84,6 +97,7 @@ erDiagram
         double q3
         double q4
         double fnl
+        bigint is_valid_completion
     }
     fct_assignments {
         bigint id PK
@@ -121,6 +135,7 @@ erDiagram
         bigint student_count
         bigint is_suppressed
         double ind1_avg_gpa
+        double ind4_pct_progressed
         double ind5_chronic_absent_rate
     }
     mart_student_abc_risk {
@@ -167,11 +182,11 @@ erDiagram
 
 | Layer | Tables | Rows |
 |-------|--------|------|
-| Dimensions | dim_students, dim_terms, dim_courses | 1,724 |
+| Dimensions | dim_students, dim_terms, dim_courses, dim_quarters, dim_courses_base | 1,942 |
 | Reference | ref_countries, ref_attendance_codes | 80 |
 | Facts | fct_enrollment, fct_grades, fct_assignments, fct_attendance_* | 314,436 |
-| Marts | mart_essa, mart_abc_risk, mart_completion, mart_scorecard | 1,989 |
-| **Total** | **15 tables** | **318,229** |
+| Marts | mart_essa, mart_abc_risk, mart_completion, mart_scorecard | 2,074 |
+| **Total** | **17 tables** | **318,532** |
 
 ---
 
@@ -179,7 +194,7 @@ erDiagram
 
 | Page | Description |
 |------|-------------|
-| **ESSA Scorecard** | 5 ESSA indicators with 4-year trends and subgroup breakdown |
+| **ESSA Scorecard** | All 5 ESSA indicators with 4-year trends and subgroup breakdown |
 | **ABC Risk** | Early warning dashboard with risk distribution and student list |
 | **Student Lookup** | Individual profiles with GPA trends and risk factors |
 | **Completion** | Graduation rates by cohort and program type |
@@ -225,10 +240,19 @@ Education-Data/
 |----------|------------|
 | Student names | Marvel characters (636) |
 | Teacher names | Fictional TV/movie teachers (178) |
-| Countries | Fictional places (Wakanda, Asgard, etc.) |
+| Countries | Preserved (real country names) |
 | School IDs | Sequential format (S000001) |
 
 All analytical relationships and metrics preserved.
+
+---
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| V2.5 | Jan 2026 | EL Progress indicator, fixed graduation logic, is_valid_completion filter |
+| V2.0 | Jan 2026 | Initial public release with 7 dashboard pages |
 
 ---
 
