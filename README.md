@@ -1,3 +1,17 @@
+# Test a simpler mermaid first
+test_mermaid = '''```mermaid
+erDiagram
+    dim_students ||--o{ fct_grades : has
+    dim_students ||--o{ fct_enrollment : has
+    dim_terms ||--o{ fct_grades : has
+    dim_courses ||--o{ fct_grades : has
+````'''
+print(test_mermaid)
+````
+
+Let me try a cleaner version that focuses on the core schema:
+````python
+%%writefile /content/Education-Data/README.md
 # Education Data Analytics Portfolio
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://education-data-bvqfw2xtdke5dfugzzh3x3.streamlit.app/)
@@ -42,105 +56,53 @@ Education data warehouse for 636 students across 4 years, demonstrating:
 erDiagram
     dim_students {
         bigint student_key PK
-        varchar school_id UK
+        varchar school_id
         varchar first_name
         varchar last_name
-        varchar gender
-        varchar country FK
-        varchar program_type
+        varchar country
         varchar esl_level
         varchar last_esl_level
         bigint is_active
-        bigint ever_boarding
     }
     dim_terms {
         bigint term_key PK
-        varchar term_name
         varchar school_year
         varchar semester
-        bigint term_order
     }
     dim_courses {
         bigint course_key PK
-        varchar course_code
-        varchar course_code_base UK
         varchar course_name
         varchar department
         varchar course_rigor
-        bigint is_lab
-    }
-    ref_countries {
-        varchar country PK
-        varchar region
-    }
-    ref_attendance_codes {
-        varchar code PK
-        varchar description
-        varchar category
-    }
-    fct_enrollment {
-        bigint enrollment_key PK
-        bigint student_key FK
-        bigint term_key FK
-        double grade_level
-        bigint is_boarding
-        bigint is_enrolled
     }
     fct_grades {
-        bigint id PK
         bigint student_key FK
         bigint term_key FK
         bigint course_key FK
-        varchar teacher
-        double q1
-        double q2
-        double q3
-        double q4
         double fnl
         bigint is_valid_completion
     }
-    fct_assignments {
-        bigint id PK
+    fct_enrollment {
         bigint student_key FK
         bigint term_key FK
-        bigint course_key FK
-        varchar teacher
-        varchar assignment_name
-        double points_earned
-        double points_possible
-        bigint is_missing
+        double grade_level
+        bigint is_enrolled
     }
     fct_attendance_quarter {
-        bigint id PK
         bigint student_key FK
         bigint term_key FK
-        varchar quarter
-        double instructional_days
         double present_days
-        bigint total_absent
-    }
-    fct_attendance_daily {
-        bigint id PK
-        bigint student_key FK
-        bigint term_key FK
-        varchar date
-        varchar period_1
-        varchar period_2
-        varchar hr
+        double instructional_days
     }
     mart_essa_accountability {
         varchar school_year
         varchar subgroup_type
-        varchar subgroup_value
-        bigint student_count
-        bigint is_suppressed
         double ind1_avg_gpa
         double ind4_pct_progressed
         double ind5_chronic_absent_rate
     }
     mart_student_abc_risk {
         bigint student_key FK
-        double absence_rate
         bigint is_A_risk
         bigint is_B_risk
         bigint is_C_risk
@@ -148,41 +110,25 @@ erDiagram
     }
     mart_completion_tracking {
         bigint student_key FK
-        bigint expected_grad_year
         varchar completion_status
         bigint is_graduated
     }
-    mart_student_scorecard {
-        bigint student_key FK
-        varchar school_year
-        double avg_fnl
-        double absence_rate
-        varchar risk_level
-    }
 
-    dim_students ||--o{ fct_enrollment : "student_key"
-    dim_students ||--o{ fct_grades : "student_key"
-    dim_students ||--o{ fct_assignments : "student_key"
-    dim_students ||--o{ fct_attendance_quarter : "student_key"
-    dim_students ||--o{ fct_attendance_daily : "student_key"
-    dim_students ||--o{ mart_student_abc_risk : "student_key"
-    dim_students ||--o{ mart_completion_tracking : "student_key"
-    dim_students ||--o{ mart_student_scorecard : "student_key"
-    dim_students }o--|| ref_countries : "country"
-    dim_terms ||--o{ fct_enrollment : "term_key"
-    dim_terms ||--o{ fct_grades : "term_key"
-    dim_terms ||--o{ fct_assignments : "term_key"
-    dim_terms ||--o{ fct_attendance_quarter : "term_key"
-    dim_terms ||--o{ fct_attendance_daily : "term_key"
-    dim_courses ||--o{ fct_grades : "course_key"
-    dim_courses ||--o{ fct_assignments : "course_key"
+    dim_students ||--o{ fct_grades : has
+    dim_students ||--o{ fct_enrollment : has
+    dim_students ||--o{ fct_attendance_quarter : has
+    dim_students ||--o{ mart_student_abc_risk : has
+    dim_students ||--o{ mart_completion_tracking : has
+    dim_terms ||--o{ fct_grades : has
+    dim_terms ||--o{ fct_enrollment : has
+    dim_courses ||--o{ fct_grades : has
 ```
 
 ### Table Summary
 
 | Layer | Tables | Rows |
 |-------|--------|------|
-| Dimensions | dim_students, dim_terms, dim_courses, dim_quarters, dim_courses_base | 1,942 |
+| Dimensions | dim_students, dim_terms, dim_courses | 1,942 |
 | Reference | ref_countries, ref_attendance_codes | 80 |
 | Facts | fct_enrollment, fct_grades, fct_assignments, fct_attendance_* | 314,436 |
 | Marts | mart_essa, mart_abc_risk, mart_completion, mart_scorecard | 2,074 |
@@ -214,7 +160,7 @@ streamlit run app.py
 ---
 
 ## Project Structure
-```
+````
 Education-Data/
 ├── README.md
 ├── requirements.txt
@@ -230,40 +176,3 @@ Education-Data/
         ├── 5_Defense_Scenarios.py
         ├── 6_Trends.py
         └── 7_Course_Analysis.py
-```
-
----
-
-## Data Anonymization
-
-| Original | Anonymized |
-|----------|------------|
-| Student names | Marvel characters (636) |
-| Teacher names | Fictional TV/movie teachers (178) |
-| Countries | Preserved (real country names) |
-| School IDs | Sequential format (S000001) |
-
-All analytical relationships and metrics preserved.
-
----
-
-## Version History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| V2.5 | Jan 2026 | EL Progress indicator, fixed graduation logic, is_valid_completion filter |
-| V2.0 | Jan 2026 | Initial public release with 7 dashboard pages |
-
----
-
-## Skills Demonstrated
-
-**Technical:** SQL, Python, DuckDB, Streamlit, Star Schema Design, ETL
-
-**Domain:** ESSA Accountability, FERPA Compliance, K-12 Metrics, Early Warning Systems
-
----
-
-## Author
-
-**SamOryeJack** - Portfolio project for Research and Accountability Data Analyst positions.
