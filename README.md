@@ -1,17 +1,3 @@
-# Test a simpler mermaid first
-test_mermaid = '''```mermaid
-erDiagram
-    dim_students ||--o{ fct_grades : has
-    dim_students ||--o{ fct_enrollment : has
-    dim_terms ||--o{ fct_grades : has
-    dim_courses ||--o{ fct_grades : has
-````'''
-print(test_mermaid)
-````
-
-Let me try a cleaner version that focuses on the core schema:
-````python
-%%writefile /content/Education-Data/README.md
 # Education Data Analytics Portfolio
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://education-data-bvqfw2xtdke5dfugzzh3x3.streamlit.app/)
@@ -160,7 +146,7 @@ streamlit run app.py
 ---
 
 ## Project Structure
-````
+```
 Education-Data/
 ├── README.md
 ├── requirements.txt
@@ -176,3 +162,40 @@ Education-Data/
         ├── 5_Defense_Scenarios.py
         ├── 6_Trends.py
         └── 7_Course_Analysis.py
+```
+
+---
+
+## Data Anonymization
+
+| Original | Anonymized |
+|----------|------------|
+| Student names | Marvel characters (636) |
+| Teacher names | Fictional TV/movie teachers (178) |
+| Countries | Preserved (real country names) |
+| School IDs | Sequential format (S000001) |
+
+All analytical relationships and metrics preserved.
+
+---
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| V2.5 | Jan 2026 | EL Progress indicator, fixed graduation logic, is_valid_completion filter |
+| V2.0 | Jan 2026 | Initial public release with 7 dashboard pages |
+
+---
+
+## Skills Demonstrated
+
+**Technical:** SQL, Python, DuckDB, Streamlit, Star Schema Design, ETL
+
+**Domain:** ESSA Accountability, FERPA Compliance, K-12 Metrics, Early Warning Systems
+
+---
+
+## Author
+
+**SamOryeJack** - Portfolio project for Research and Accountability Data Analyst positions.
