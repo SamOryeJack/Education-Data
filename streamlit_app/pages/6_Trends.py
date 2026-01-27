@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 
-st.set_page_config(page_title="Trends", page_icon="chart", layout="wide")
+st.set_page_config(page_title="Trends", page_icon="📈", layout="wide")
 
 DB_PATH = 'data/school_analytics.duckdb'
 
@@ -36,7 +36,7 @@ enrollment_df = conn.execute("""
     ORDER BY t.school_year
 """).fetchdf()
 
-# Load grade distribution by year
+# Load grade distribution by year (valid completions only)
 grades_df = conn.execute("""
     SELECT 
         t.school_year,
@@ -50,7 +50,7 @@ grades_df = conn.execute("""
         COUNT(*) as count
     FROM fct_grades g
     JOIN dim_terms t ON g.term_key = t.term_key
-    WHERE g.fnl IS NOT NULL
+    WHERE g.fnl IS NOT NULL AND g.is_valid_completion = 1
     GROUP BY t.school_year, grade_band
     ORDER BY t.school_year
 """).fetchdf()

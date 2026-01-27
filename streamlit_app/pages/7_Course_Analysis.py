@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 
-st.set_page_config(page_title="Course Analysis", page_icon="book", layout="wide")
+st.set_page_config(page_title="Course Analysis", page_icon="📚", layout="wide")
 
 DB_PATH = 'data/school_analytics.duckdb'
 
@@ -17,7 +17,7 @@ def get_connection():
 
 conn = get_connection()
 
-# Department performance
+# Department performance (valid completions only)
 dept_df = conn.execute("""
     SELECT 
         c.department,
@@ -27,13 +27,13 @@ dept_df = conn.execute("""
         ROUND(100.0 * SUM(CASE WHEN g.fnl >= 90 THEN 1 ELSE 0 END) / COUNT(*), 1) as a_rate
     FROM fct_grades g
     JOIN dim_courses c ON g.course_key = c.course_key
-    WHERE g.fnl IS NOT NULL
+    WHERE g.fnl IS NOT NULL AND g.is_valid_completion = 1
       AND c.is_lab = 0 AND c.is_homeroom = 0 AND c.is_admin = 0
     GROUP BY c.department
     ORDER BY avg_grade DESC
 """).fetchdf()
 
-# Course-level performance (top/bottom)
+# Course-level performance (top/bottom, valid completions only)
 course_df = conn.execute("""
     SELECT 
         c.course_name,
@@ -44,14 +44,14 @@ course_df = conn.execute("""
         ROUND(100.0 * SUM(CASE WHEN g.fnl >= 75 THEN 1 ELSE 0 END) / COUNT(*), 1) as pass_rate
     FROM fct_grades g
     JOIN dim_courses c ON g.course_key = c.course_key
-    WHERE g.fnl IS NOT NULL
+    WHERE g.fnl IS NOT NULL AND g.is_valid_completion = 1
       AND c.is_lab = 0 AND c.is_homeroom = 0 AND c.is_admin = 0
     GROUP BY c.course_key, c.course_name, c.department, c.course_rigor
     HAVING COUNT(*) >= 10
     ORDER BY avg_grade DESC
 """).fetchdf()
 
-# Rigor level performance
+# Rigor level performance (valid completions only)
 rigor_df = conn.execute("""
     SELECT 
         c.course_rigor,
@@ -60,14 +60,14 @@ rigor_df = conn.execute("""
         ROUND(100.0 * SUM(CASE WHEN g.fnl >= 75 THEN 1 ELSE 0 END) / COUNT(*), 1) as pass_rate
     FROM fct_grades g
     JOIN dim_courses c ON g.course_key = c.course_key
-    WHERE g.fnl IS NOT NULL
+    WHERE g.fnl IS NOT NULL AND g.is_valid_completion = 1
       AND c.is_lab = 0 AND c.is_homeroom = 0 AND c.is_admin = 0
       AND c.course_rigor IS NOT NULL
     GROUP BY c.course_rigor
     ORDER BY avg_grade DESC
 """).fetchdf()
 
-# Failure rate by department
+# Failure rate by department (valid completions only)
 failure_df = conn.execute("""
     SELECT 
         c.department,
@@ -76,7 +76,7 @@ failure_df = conn.execute("""
         ROUND(100.0 * SUM(CASE WHEN g.fnl < 75 THEN 1 ELSE 0 END) / COUNT(*), 1) as fail_rate
     FROM fct_grades g
     JOIN dim_courses c ON g.course_key = c.course_key
-    WHERE g.fnl IS NOT NULL
+    WHERE g.fnl IS NOT NULL AND g.is_valid_completion = 1
       AND c.is_lab = 0 AND c.is_homeroom = 0 AND c.is_admin = 0
     GROUP BY c.department
     ORDER BY fail_rate DESC

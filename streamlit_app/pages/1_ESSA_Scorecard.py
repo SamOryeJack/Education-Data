@@ -6,7 +6,7 @@ import duckdb
 import plotly.graph_objects as go
 import pandas as pd
 
-st.set_page_config(page_title="ESSA Scorecard", page_icon="chart", layout="wide")
+st.set_page_config(page_title="ESSA Scorecard", page_icon="📊", layout="wide")
 
 DB_PATH = 'data/school_analytics.duckdb'
 
@@ -31,17 +31,18 @@ selected_subgroup = col2.selectbox("Select Subgroup Type", subgroup_types)
 
 st.divider()
 
-# Display 5 ESSA metrics (for selected year, Overall)
+# Display 6 ESSA metrics (for selected year, Overall)
 st.subheader(f"ESSA Indicators: {selected_year}")
 
 current = df[(df['school_year'] == selected_year) & (df['subgroup_type'] == 'Overall')].iloc[0]
 
-m1, m2, m3, m4, m5 = st.columns(5)
+m1, m2, m3, m4, m5, m6 = st.columns(6)
 m1.metric("Avg GPA", f"{current['ind1_avg_gpa']:.1f}", help="Indicator 1: Academic Achievement")
 m2.metric("Pass Rate", f"{current['ind1_course_pass_rate']:.1f}%", help="Indicator 1: Course Pass Rate")
 m3.metric("% Improved", f"{current['ind2_pct_improved']:.1f}%" if pd.notna(current['ind2_pct_improved']) else "N/A", help="Indicator 2: Academic Progress")
 m4.metric("Grad Rate", f"{current['ind3_graduation_rate']:.1f}%", help="Indicator 3: Graduation Rate")
-m5.metric("Chronic Absence", f"{current['ind5_chronic_absent_rate']:.1f}%", help="Indicator 5: School Quality")
+m5.metric("EL Progress", f"{current['ind4_pct_progressed']:.1f}%" if pd.notna(current['ind4_pct_progressed']) else "N/A", help="Indicator 4: EL Proficiency Progress")
+m6.metric("Chronic Absence", f"{current['ind5_chronic_absent_rate']:.1f}%", help="Indicator 5: School Quality")
 
 st.divider()
 
@@ -89,13 +90,13 @@ subgroup_data = df[(df['school_year'] == selected_year) & (df['subgroup_type'] =
 display_df = subgroup_data[['subgroup_value', 'student_count', 'is_suppressed',
                             'ind1_avg_gpa', 'ind1_course_pass_rate', 
                             'ind2_pct_improved', 'ind3_graduation_rate',
-                            'ind5_chronic_absent_rate']].copy()
+                            'ind4_pct_progressed', 'ind5_chronic_absent_rate']].copy()
 
 display_df.columns = ['Subgroup', 'N', 'Suppressed', 'Avg GPA', 'Pass Rate', 
-                      '% Improved', 'Grad Rate', 'Chronic Abs']
+                      '% Improved', 'Grad Rate', 'EL Progress', 'Chronic Abs']
 
 # Apply suppression display
-for col in ['Avg GPA', 'Pass Rate', '% Improved', 'Grad Rate', 'Chronic Abs']:
+for col in ['Avg GPA', 'Pass Rate', '% Improved', 'Grad Rate', 'EL Progress', 'Chronic Abs']:
     display_df[col] = display_df.apply(
         lambda row: '***' if row['Suppressed'] == 1 else f"{row[col]:.1f}" if pd.notna(row[col]) else 'N/A', 
         axis=1
@@ -119,6 +120,6 @@ with st.expander("ESSA Indicator Reference"):
     | 1 | Academic Achievement | Avg GPA, Course Pass Rate | Proxy for state test proficiency |
     | 2 | Academic Progress | % with GPA improvement YoY | Proxy for Student Growth Percentile |
     | 3 | Graduation Rate | Seniors completing = graduated | ACGR-style calculation |
-    | 4 | EL Proficiency | (Not yet implemented) | Need ESL level progression data |
+    | 4 | EL Proficiency | % EL students progressing levels | Based on ESL level changes YoY |
     | 5 | School Quality (SQSS) | Chronic Absence Rate (>=10%) | Aligns with common SQSS measure |
     """)

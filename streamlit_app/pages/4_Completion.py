@@ -7,8 +7,9 @@ import duckdb
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
+from datetime import datetime
 
-st.set_page_config(page_title="Completion Tracker", page_icon="graduation", layout="wide")
+st.set_page_config(page_title="Completion Tracker", page_icon="🎓", layout="wide")
 
 DB_PATH = 'data/school_analytics.duckdb'
 
@@ -20,6 +21,9 @@ conn = get_connection()
 df = conn.execute("SELECT * FROM mart_completion_tracking").fetchdf()
 conn.close()
 
+# Dynamic year: completed cohorts are those with expected_grad_year < current calendar year
+current_year = datetime.now().year
+
 st.title("Completion Tracker")
 st.markdown("Graduation rates and completion status by cohort")
 
@@ -27,14 +31,14 @@ st.divider()
 
 # Summary Metrics
 graduated = len(df[df['completion_status'] == 'Graduated'])
-current = len(df[df['completion_status'] == 'Current'])
+active = len(df[df['completion_status'] == 'Active'])
 departed = len(df[df['completion_status'] == 'Departed'])
 total = len(df)
 
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Total Students", total)
 col2.metric("Graduated", graduated)
-col3.metric("Current", current)
+col3.metric("Active", active)
 col4.metric("Departed", departed)
 
 st.divider()
@@ -54,7 +58,7 @@ with left_col:
         color=status_counts.index,
         color_discrete_map={
             'Graduated': '#2ca02c',
-            'Current': '#1f77b4',
+            'Active': '#1f77b4',
             'Departed': '#d62728'
         }
     )
@@ -65,8 +69,8 @@ with right_col:
     # Graduation Rate by Expected Year
     st.subheader("Graduation Rate by Cohort")
     
-    # Only completed cohorts (expected grad <= 2025)
-    completed = df[df['expected_grad_year'] <= 2025].copy()
+    # Only completed cohorts (expected grad year before current year)
+    completed = df[df['expected_grad_year'] < current_year].copy()
     
     cohort_stats = completed.groupby('expected_grad_year').agg(
         total=('student_key', 'count'),
@@ -98,7 +102,7 @@ st.divider()
 st.subheader("Graduation Rate by Program Type")
 
 # Only completed cohorts
-completed = df[df['expected_grad_year'] <= 2025].copy()
+completed = df[df['expected_grad_year'] < current_year].copy()
 
 program_stats = completed.groupby('program_type').agg(
     total=('student_key', 'count'),
@@ -133,16 +137,16 @@ st.subheader("Cohort Details")
 cohort_detail = df.groupby('expected_grad_year').agg(
     total=('student_key', 'count'),
     graduated=('is_graduated', 'sum'),
-    current=('completion_status', lambda x: (x == 'Current').sum()),
+    active=('completion_status', lambda x: (x == 'Active').sum()),
     departed=('completion_status', lambda x: (x == 'Departed').sum())
 ).reset_index()
 
 cohort_detail['grad_rate'] = (cohort_detail['graduated'] / cohort_detail['total'] * 100).round(1)
-cohort_detail.columns = ['Expected Grad Year', 'Total', 'Graduated', 'Current', 'Departed', 'Grad Rate %']
+cohort_detail.columns = ['Expected Grad Year', 'Total', 'Graduated', 'Active', 'Departed', 'Grad Rate %']
 
 # Format grad rate - show N/A for future cohorts
 cohort_detail['Grad Rate %'] = cohort_detail.apply(
-    lambda r: f"{r['Grad Rate %']:.1f}%" if r['Expected Grad Year'] <= 2025 else 'In Progress',
+    lambda r: f"{r['Grad Rate %']:.1f}%" if r['Expected Grad Year'] < current_year else 'In Progress',
     axis=1
 )
 
@@ -154,8 +158,8 @@ st.divider()
 with st.expander("Methodology Notes"):
     st.markdown("""
     **Definitions:**
-    - **Graduated:** Students who reached Grade 12 with 4+ courses having final grades
-    - **Current:** Students still enrolled
+    - **Graduated:** Students who reached Grade 12 with 4+ courses having final grades AND are no longer active
+    - **Active:** Students still enrolled
     - **Departed:** Students who left before graduation
     
     **Expected Graduation Year:** Calculated as intake_year + (12 - first_grade)

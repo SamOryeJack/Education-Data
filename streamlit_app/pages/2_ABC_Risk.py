@@ -8,7 +8,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 
-st.set_page_config(page_title="ABC Risk Dashboard", page_icon="warning", layout="wide")
+st.set_page_config(page_title="ABC Risk Dashboard", page_icon="⚠️", layout="wide")
 
 DB_PATH = 'data/school_analytics.duckdb'
 
@@ -26,7 +26,8 @@ st.markdown("Early Warning System: **A**ttendance, **B**ehavior, **C**ourse Perf
 st.divider()
 
 # Summary Metrics
-st.subheader("Risk Level Summary (2025-26)")
+current_year = df['school_year'].iloc[0]
+st.subheader(f"Risk Level Summary ({current_year})")
 
 col1, col2, col3, col4 = st.columns(4)
 

@@ -7,7 +7,7 @@ import duckdb
 import plotly.graph_objects as go
 import pandas as pd
 
-st.set_page_config(page_title="Defense Scenarios", page_icon="shield", layout="wide")
+st.set_page_config(page_title="Defense Scenarios", page_icon="🛡️", layout="wide")
 
 DB_PATH = 'data/school_analytics.duckdb'
 
@@ -20,6 +20,10 @@ essa_df = conn.execute("SELECT * FROM mart_essa_accountability WHERE subgroup_ty
 abc_df = conn.execute("SELECT * FROM mart_student_abc_risk").fetchdf()
 completion_df = conn.execute("SELECT * FROM mart_completion_tracking").fetchdf()
 conn.close()
+
+# Get current year dynamically
+current_year = essa_df['school_year'].max()
+latest = essa_df[essa_df['school_year'] == current_year].iloc[0]
 
 st.title("Defense Scenarios")
 st.markdown("Data packages for accountability responses and stakeholder communications")
@@ -45,7 +49,7 @@ if scenario == "A: High Chronic Absenteeism":
     st.subheader("Scenario A: High Chronic Absenteeism Defense")
     
     # Current concern
-    current_rate = essa_df[essa_df['school_year'] == '2025-26']['ind5_chronic_absent_rate'].values[0]
+    current_rate = latest['ind5_chronic_absent_rate']
     st.error(f"Current Concern: Chronic absenteeism rate is {current_rate:.1f}%")
     
     st.markdown("---")
@@ -69,7 +73,6 @@ if scenario == "A: High Chronic Absenteeism":
     st.plotly_chart(fig, use_container_width=True)
     
     # Trend narrative
-    rates = essa_df['ind5_chronic_absent_rate'].tolist()
     peak_year = essa_df.loc[essa_df['ind5_chronic_absent_rate'].idxmax(), 'school_year']
     peak_rate = essa_df['ind5_chronic_absent_rate'].max()
     
@@ -103,14 +106,12 @@ if scenario == "A: High Chronic Absenteeism":
     # 3. Offsetting Strengths
     st.markdown("**3. Offsetting Strengths**")
     
-    latest = essa_df[essa_df['school_year'] == '2025-26'].iloc[0]
-    
     col1, col2, col3 = st.columns(3)
     col1.metric("GPA", f"{latest['ind1_avg_gpa']:.1f}")
     col2.metric("Pass Rate", f"{latest['ind1_course_pass_rate']:.1f}%")
     col3.metric("Graduation Rate", f"{latest['ind3_graduation_rate']:.1f}%")
     
-    st.success("Despite attendance challenges, academic performance remains strong with 91.7 GPA and 93.9% course pass rate.")
+    st.success(f"Despite attendance challenges, academic performance remains strong with {latest['ind1_avg_gpa']:.1f} GPA and {latest['ind1_course_pass_rate']:.1f}% course pass rate.")
 
 # ============================================
 # SCENARIO B: Course Failure Concerns
@@ -144,7 +145,7 @@ elif scenario == "B: Course Failure Concerns":
     )
     st.plotly_chart(fig, use_container_width=True)
     
-    latest_pass = essa_df[essa_df['school_year'] == '2025-26']['ind1_course_pass_rate'].values[0]
+    latest_pass = latest['ind1_course_pass_rate']
     st.info(f"Current pass rate of {latest_pass:.1f}% is above 90% threshold.")
     
     st.markdown("---")
@@ -176,16 +177,21 @@ elif scenario == "B: Course Failure Concerns":
     
     st.markdown("---")
     
-    # 3. Intervention Response
+    # 3. Intervention Response - calculated from data
     st.markdown("**3. Intervention Framework**")
     
-    st.markdown("""
+    critical_count = len(abc_df[abc_df['risk_level'] == 'Critical'])
+    high_count = len(abc_df[abc_df['risk_level'] == 'High'])
+    monitor_count = len(abc_df[abc_df['risk_level'] == 'Monitor'])
+    low_count = len(abc_df[abc_df['risk_level'] == 'Low'])
+    
+    st.markdown(f"""
     | Risk Level | Count | Intervention |
     |------------|-------|--------------|
-    | Critical (3 factors) | 2 | Immediate support team meeting |
-    | High (2 factors) | 36 | Weekly check-ins with advisor |
-    | Monitor (1 factor) | 55 | Bi-weekly progress monitoring |
-    | Low (0 factors) | 138 | Standard support |
+    | Critical (3 factors) | {critical_count} | Immediate support team meeting |
+    | High (2 factors) | {high_count} | Weekly check-ins with advisor |
+    | Monitor (1 factor) | {monitor_count} | Bi-weekly progress monitoring |
+    | Low (0 factors) | {low_count} | Standard support |
     """)
 
 # ============================================
@@ -209,20 +215,28 @@ else:
     
     st.markdown("---")
     
-    # Key Strengths
+    # Key Strengths - calculated from data
     st.markdown("**Key Strengths**")
     
+    min_grad_rate = essa_df['ind3_graduation_rate'].min()
+    min_gpa = essa_df['ind1_avg_gpa'].min()
+    min_pass_rate = essa_df['ind1_course_pass_rate'].min()
+    
     col1, col2, col3 = st.columns(3)
-    col1.success("100% Graduation Rate (all 4 years)")
-    col2.success("GPA consistently above 88")
-    col3.success("Pass rate above 91% every year")
+    col1.success(f"Graduation Rate {min_grad_rate:.0f}%+ (all years)")
+    col2.success(f"GPA consistently above {min_gpa:.0f}")
+    col3.success(f"Pass rate above {min_pass_rate:.0f}% every year")
     
     st.markdown("---")
     
-    # Areas for Improvement
+    # Areas for Improvement - calculated from data
     st.markdown("**Areas for Improvement**")
     
-    st.warning("Chronic absenteeism peaked at 47.3% in 2023-24, now at 22.1%")
+    peak_absence_year = essa_df.loc[essa_df['ind5_chronic_absent_rate'].idxmax(), 'school_year']
+    peak_absence_rate = essa_df['ind5_chronic_absent_rate'].max()
+    current_absence_rate = latest['ind5_chronic_absent_rate']
+    
+    st.warning(f"Chronic absenteeism peaked at {peak_absence_rate:.1f}% in {peak_absence_year}, now at {current_absence_rate:.1f}%")
     
     st.markdown("---")
     
@@ -238,7 +252,7 @@ else:
     col3.metric("Departed Early", departed)
     
     overall_rate = graduated / (graduated + departed) * 100
-    st.info(f"Overall completion rate: {overall_rate:.1f}% of non-current students graduated")
+    st.info(f"Overall completion rate: {overall_rate:.1f}% of non-active students graduated")
 
 st.divider()
 

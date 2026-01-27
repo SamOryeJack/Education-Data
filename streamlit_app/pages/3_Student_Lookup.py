@@ -7,7 +7,7 @@ import duckdb
 import plotly.graph_objects as go
 import pandas as pd
 
-st.set_page_config(page_title="Student Lookup", page_icon="user", layout="wide")
+st.set_page_config(page_title="Student Lookup", page_icon="👤", layout="wide")
 
 DB_PATH = 'data/school_analytics.duckdb'
 
@@ -100,7 +100,12 @@ with right_col:
     st.subheader("Risk Status")
     
     risk_level = latest['risk_level'] if pd.notna(latest['risk_level']) else 'Unknown'
-    risk_score = int(latest['risk_score']) if pd.notna(latest['risk_score']) else 0
+    
+    # Calculate risk_score safely handling NA values
+    a_val = 1 if pd.notna(latest['is_A_risk']) and latest['is_A_risk'] == 1 else 0
+    b_val = 1 if pd.notna(latest['is_B_risk']) and latest['is_B_risk'] == 1 else 0
+    c_val = 1 if pd.notna(latest['is_C_risk']) and latest['is_C_risk'] == 1 else 0
+    risk_score = a_val + b_val + c_val
     
     if risk_level == 'Low':
         st.success(f"Low Risk - Score: {risk_score}/3")
@@ -113,9 +118,9 @@ with right_col:
     else:
         st.info("Risk level not available")
     
-    a_risk = "At Risk" if latest['is_A_risk'] == 1 else "OK"
-    b_risk = "At Risk" if latest['is_B_risk'] == 1 else "OK"
-    c_risk = "At Risk" if latest['is_C_risk'] == 1 else "OK"
+    a_risk = "At Risk" if pd.notna(latest['is_A_risk']) and latest['is_A_risk'] == 1 else "OK"
+    b_risk = "At Risk" if pd.notna(latest['is_B_risk']) and latest['is_B_risk'] == 1 else "OK"
+    c_risk = "At Risk" if pd.notna(latest['is_C_risk']) and latest['is_C_risk'] == 1 else "OK"
     
     st.markdown(f"**A (Attendance):** {a_risk}")
     st.markdown(f"**B (Behavior):** {b_risk}")
